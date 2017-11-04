@@ -11,7 +11,7 @@ import java.sql.ResultSet;
 
 public class ReadWriteBlob {
 
-	public static void writeBlob(String[] args) throws Exception {
+	public static void writeBlob(String fileName, int id) throws Exception {
 
 		Connection connection = null;
 		PreparedStatement statement = null;
@@ -24,11 +24,11 @@ public class ReadWriteBlob {
 					"jdbc:mysql://localhost:3306/table");
 
 			// Prepare statement
-			String sql = "update table set objectData=? where id='uniqueID'";
+			String sql = "update table set objectData=? where id='" + id + "'";
 			statement = connection.prepareStatement(sql);
 			
 			// Set parameter for input file name
-			File file = new File("File.pdf");
+			File file = new File(fileName); 
 			input = new FileInputStream(file);
 			statement.setBinaryStream(1, input);
 			
@@ -47,7 +47,7 @@ public class ReadWriteBlob {
 		}
 	}
 	
-	public static void readBlob(String[] args) throws Exception {
+	public static void readBlob(String fileName, int id) throws Exception {
 
 		Connection connection = null;
 		Statement statement = null;
@@ -63,11 +63,11 @@ public class ReadWriteBlob {
 
 			// Execute statement
 			statement = connection.createStatement();
-			String sql = "select objectData from table where id='uniqueID'";
+			String sql = "select objectData from table where id='" + id + "'";
 			result = statement.executeQuery(sql);
 			
 			// Set up a handle to the file
-			File file = new File("File.pdf");
+			File file = new File(fileName);
 			output = new FileOutputStream(file);
 
 			if (result.next()) {
@@ -107,6 +107,21 @@ public class ReadWriteBlob {
 		if (connection != null) {
 			connection.close();
 		}
+	}
+	
+	public static void main(String []args) {
+		// Writing object data as blob
+		for (int i=0;i<10;i++) {
+			String fileName = "File" + i;
+			writeBlob(fileName,i);
+		}
+		
+		// Reading blob data
+		for (int i=0;i<10;i++) {
+			String fileName = "File" + i;
+			readBlob(fileName,i);
+		}
+		
 	}
 
 }
